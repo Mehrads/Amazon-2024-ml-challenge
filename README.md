@@ -1,141 +1,127 @@
-# ML Challenge Problem Statement
+# ML Challenge: Feature Extraction from Images
 
-## Feature Extraction from Images
+## Overview
 
-In this hackathon, the goal is to create a machine learning model that extracts entity values from images. This capability is crucial in fields like healthcare, e-commerce, and content moderation, where precise product information is vital. As digital marketplaces expand, many products lack detailed textual descriptions, making it essential to obtain key details directly from images. These images provide important information such as weight, volume, voltage, wattage, dimensions, and many more, which are critical for digital stores.
+This project focuses on building a machine learning model to extract entity values from images. This is particularly useful in industries such as healthcare, e-commerce, and content moderation, where obtaining precise product information directly from images is essential. The extracted information includes weight, volume, voltage, wattage, dimensions, and more, which are critical for digital marketplaces.
 
-### Data Description: 
+## Dataset Description
 
-The dataset consists of the following columns: 
+The dataset consists of the following columns:
 
-1. **index:** An unique identifier (ID) for the data sample
-2. **image_link**: Public URL where the product image is available for download. Example link - https://m.media-amazon.com/images/I/71XfHPR36-L.jpg
-    To download images use `download_images` function from `src/utils.py`. See sample code in `src/test.ipynb`.
-3. **group_id**: Category code of the product
-4. **entity_name:** Product entity name. For eg: “item_weight” 
-5. **entity_value:** Product entity value. For eg: “34 gram” 
-    Note: For test.csv, you will not see the column `entity_value` as it is the target variable.
+- **index**: Unique identifier for the data sample.
+- **image\_link**: URL to download the product image. Example: `https://m.media-amazon.com/images/I/71XfHPR36-L.jpg`.
+  - To download images, use the `download_images` function in `src/utils.py`. See sample usage in `src/test.ipynb`.
+- **group\_id**: Category code of the product.
+- **entity\_name**: Name of the product entity (e.g., `item_weight`).
+- **entity\_value**: Value associated with the entity (e.g., `34 gram`).
+  - Note: `entity_value` is not present in `test.csv` as it is the target variable.
 
-### Output Format:
+## Methodology
 
-The output file should be a csv with 2 columns:
+Our approach involves:
+![Screenshot 2025-03-04 at 8 12 31 PM](https://github.com/user-attachments/assets/a0aa3181-9005-4ffb-b405-e2a81331d828)
 
-1. **index:** The unique identifier (ID) of the data sample. Note the index should match the test record index.
-2. **prediction:** A string which should have the following format: “x unit” where x is a float number in standard formatting and unit is one of the allowed units (allowed units are mentioned in the Appendix). The two values should be concatenated and have a space between them. For eg: “2 gram”, “12.5 centimetre”, “2.56 ounce” are valid. Few invalid cases: “2 gms”, “60 ounce/1.7 kilogram”, “2.2e2 kilogram” etc.
-    Note: Make sure to output a prediction for all indices. If no value is found in the image for any test sample, return empty string, i.e, `“”`. If you have less/more number of output samples in the output file as compared to test.csv, your output won’t be evaluated. 
+1. **Data Preprocessing**:
 
-### File Descriptions:
+   - Download and clean images from `image_link`.
+   - Convert images to a standardized format (e.g., resizing, grayscale, or RGB normalization).
+   - Augment data where necessary for better generalization.
 
-*source files*
+2. **Feature Extraction**:
 
-1. **src/sanity.py**: Sanity checker to ensure that the final output file passes all formatting checks. Note: the script will not check if less/more number of predictions are present compared to the test file. See sample code in `src/test.ipynb` 
-2. **src/utils.py**: Contains helper functions for downloading images from the image_link.
-3. **src/constants.py:** Contains the allowed units for each entity type.
-4. **sample_code.py:** We also provided a sample dummy code that can generate an output file in the given format. Usage of this file is optional. 
+   - Apply Optical Character Recognition (OCR) using **EasyOCR** to detect and extract textual information from images.
 
-*Dataset files*
+3. **Entity Recognition & Value Prediction**:
 
-1. **dataset/train.csv**: Training file with labels (`entity_value`).
-2. **dataset/test.csv**: Test file without output labels (`entity_value`). Generate predictions using your model/solution on this file's data and format the output file to match sample_test_out.csv (Refer the above section "Output Format")
-3. **dataset/sample_test.csv**: Sample test input file.
-4. **dataset/sample_test_out.csv**: Sample outputs for sample_test.csv. The output for test.csv must be formatted in the exact same way. Note: The predictions in the file might not be correct
+   - Train a Named Entity Recognition (NER) model using **BERT-based transformers** to classify extracted text into predefined entities.
+   - Utilize a regression model or sequence-to-sequence transformer to predict entity values from extracted text and features.
 
-### Constraints
+4. **Post-processing & Unit Normalization**:
 
-1. You will be provided with a sample output file and a sanity checker file. Format your output to match the sample output file exactly and pass it through the sanity checker to ensure its validity. Note: If the file does not pass through the sanity checker, it will not be evaluated. You should recieve a message like `Parsing successfull for file: ...csv` if the output file is correctly formatted.
+   - Map extracted values to allowed units defined in `constants.py`.
+   - Apply rule-based transformations to ensure consistency in formatting (e.g., `2 kilogram` instead of `2kg`).
 
-2. You are given the list of allowed units in constants.py and also in Appendix. Your outputs must be in these units. Predictions using any other units will be considered invalid during validation.
+5. **Model Training & Evaluation**:
 
-### Evaluation Criteria
+   - Train the model on `train.csv` using **cross-validation**.
+   - Evaluate predictions using **F1-score**, ensuring accurate extraction and classification.
+   - Fine-tune hyperparameters and optimize inference time for better performance.
 
-Submissions will be evaluated based on F1 score, which are standard measures of prediction accuracy for classification and extraction problems.
+6. **Output Formatting & Validation**:
 
-Let GT = Ground truth value for a sample and OUT be output prediction from the model for a sample. Then we classify the predictions into one of the 4 classes with the following logic: 
+   - Ensure outputs match the required format in `sample_test_out.csv`.
+   - Validate predictions using `sanity.py` to check for formatting correctness before submission.
 
-1. *True Positives* - If OUT != `""` and GT != `""` and OUT == GT
-2. *False Positives* - If OUT != `""` and GT != `""` and OUT != GT
-3. *False Positives* - If OUT != `""` and GT == `""`
-4. *False Negatives* - If OUT == `""` and GT != `""`
-5. *True Negatives* - If OUT == `""` and GT == `""` 
+## Output Format
 
-Then, F1 score = 2*Precision*Recall/(Precision + Recall) where:
+The model should generate a CSV file with the following columns:
 
-1. Precision = True Positives/(True Positives + False Positives)
-2. Recall = True Positives/(True Positives + False Negatives)
+- **index**: Unique identifier of the data sample.
+- **prediction**: A string formatted as `x unit`, where `x` is a float and `unit` is one of the allowed units.
+  - Example: `2 gram`, `12.5 centimetre`, `2.56 ounce`.
+  - Invalid cases: `2 gms`, `60 ounce/1.7 kilogram`, `2.2e2 kilogram`.
+- Ensure that all indices from `test.csv` are included in the output.
+- If no value is found, return an empty string (`""`).
 
-### Submission File
+## Project Structure
 
-Upload a test_out.csv file in the Portal with the exact same formatting as sample_test_out.csv
+### Source Files
 
-### Appendix
+- `src/sanity.py`: Ensures the final output file passes formatting checks.
+- `src/utils.py`: Contains helper functions, including downloading images.
+- `src/constants.py`: Defines allowed units for each entity type.
+- `sample_code.py`: A dummy script for generating a properly formatted output file (optional usage).
 
-```
+### Dataset Files
+
+- `dataset/train.csv`: Training data with labels (`entity_value`).
+- `dataset/test.csv`: Test data without labels.
+- `dataset/sample_test.csv`: Sample test input.
+- `dataset/sample_test_out.csv`: Sample formatted output file.
+
+## Constraints
+
+- Format the output exactly as `sample_test_out.csv`.
+- Run the output through `src/sanity.py` to ensure formatting correctness.
+- Use only the allowed units specified in `src/constants.py`.
+
+## Evaluation Criteria
+
+Submissions will be evaluated using the **F1-score**, based on the following classification:
+
+- **True Positives (TP)**: `OUT != ""` and `GT != ""` and `OUT == GT`
+- **False Positives (FP)**: `OUT != ""` and `GT != ""` and `OUT != GT`
+- **False Positives (FP)**: `OUT != ""` and `GT == ""`
+- **False Negatives (FN)**: `OUT == ""` and `GT != ""`
+- **True Negatives (TN)**: `OUT == ""` and `GT == ""`
+
+### F1-score Calculation
+
+\(F1 = \frac{2 \times Precision \times Recall}{Precision + Recall}\) where:
+
+- **Precision** = \(\frac{TP}{TP + FP}\)
+- **Recall** = \(\frac{TP}{TP + FN}\)
+
+## Submission Guidelines
+
+- Upload `test_out.csv` formatted exactly like `sample_test_out.csv`.
+- Ensure all test indices are included in the output.
+- Run the `sanity.py` checker to validate format before submission.
+
+## Appendix: Allowed Units
+
+A mapping of entity types to their allowed units:
+
+```python
 entity_unit_map = {
-  "width": {
-    "centimetre",
-    "foot",
-    "millimetre",
-    "metre",
-    "inch",
-    "yard"
-  },
-  "depth": {
-    "centimetre",
-    "foot",
-    "millimetre",
-    "metre",
-    "inch",
-    "yard"
-  },
-  "height": {
-    "centimetre",
-    "foot",
-    "millimetre",
-    "metre",
-    "inch",
-    "yard"
-  },
-  "item_weight": {
-    "milligram",
-    "kilogram",
-    "microgram",
-    "gram",
-    "ounce",
-    "ton",
-    "pound"
-  },
-  "maximum_weight_recommendation": {
-    "milligram",
-    "kilogram",
-    "microgram",
-    "gram",
-    "ounce",
-    "ton",
-    "pound"
-  },
-  "voltage": {
-    "millivolt",
-    "kilovolt",
-    "volt"
-  },
-  "wattage": {
-    "kilowatt",
-    "watt"
-  },
-  "item_volume": {
-    "cubic foot",
-    "microlitre",
-    "cup",
-    "fluid ounce",
-    "centilitre",
-    "imperial gallon",
-    "pint",
-    "decilitre",
-    "litre",
-    "millilitre",
-    "quart",
-    "cubic inch",
-    "gallon"
-  }
+  "width": {"centimetre", "foot", "millimetre", "metre", "inch", "yard"},
+  "depth": {"centimetre", "foot", "millimetre", "metre", "inch", "yard"},
+  "height": {"centimetre", "foot", "millimetre", "metre", "inch", "yard"},
+  "item_weight": {"milligram", "kilogram", "microgram", "gram", "ounce", "ton", "pound"},
+  "maximum_weight_recommendation": {"milligram", "kilogram", "microgram", "gram", "ounce", "ton", "pound"},
+  "voltage": {"millivolt", "kilovolt", "volt"},
+  "wattage": {"kilowatt", "watt"},
+  "item_volume": {"cubic foot", "microlitre", "cup", "fluid ounce", "centilitre", "imperial gallon", "pint", "decilitre", "litre", "millilitre", "quart", "cubic inch", "gallon"}
 }
 ```
+
