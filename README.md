@@ -1,7 +1,8 @@
-# ML Challenge: Feature Extraction from Images
+# Amazon ML Challenge 2024
+## Problem Statement : Feature Extraction from Images
 
 ## Overview
-This project focuses on building a machine learning model to extract entity values from images. This is particularly useful in industries such as healthcare, e-commerce, and content moderation, where obtaining precise product information directly from images is essential. The extracted information includes weight, volume, voltage, wattage, dimensions, and more, which are critical for digital marketplaces.
+The goal is to create a machine learning model that extracts entity values from images. This is particularly useful in industries such as healthcare, e-commerce, and content moderation, where obtaining precise product information directly from images is essential. The extracted information includes weight, volume, voltage, wattage, dimensions, and more, which are critical for digital marketplaces.
 
 ## Dataset Description
 The dataset consists of the following columns:
@@ -80,11 +81,6 @@ Submissions will be evaluated using the **F1-score**, based on the following cla
 where:
 - **Precision** = \( \frac{TP}{TP + FP} \)
 - **Recall** = \( \frac{TP}{TP + FN} \)
-
-## Submission Guidelines
-- Upload `test_out.csv` formatted exactly like `sample_test_out.csv`.
-- Ensure all test indices are included in the output.
-- Run the `sanity.py` checker to validate format before submission.
 
 ## Appendix: Allowed Units
 A mapping of entity types to their allowed units:
