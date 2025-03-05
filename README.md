@@ -21,11 +21,10 @@ Our approach involves:
    - Augment data where necessary for better generalization.
 
 2. **Feature Extraction**:
-   - Utilize pre-trained deep learning models such as **EfficientNet, ResNet, or Vision Transformers (ViTs)** to extract meaningful features from images.
-   - Apply Optical Character Recognition (OCR) using **Tesseract OCR or EasyOCR** to detect and extract textual information from images.
+   - Apply Optical Character Recognition (OCR) using **EasyOCR** to detect and extract textual information from images.
 
 3. **Entity Recognition & Value Prediction**:
-   - Train a Named Entity Recognition (NER) model using **spaCy or BERT-based transformers** to classify extracted text into predefined entities.
+   - Train a Named Entity Recognition (NER) model using **BERT-based transformers** to classify extracted text into predefined entities.
    - Utilize a regression model or sequence-to-sequence transformer to predict entity values from extracted text and features.
 
 4. **Post-processing & Unit Normalization**:
