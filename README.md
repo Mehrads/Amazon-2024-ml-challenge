@@ -15,6 +15,8 @@ The dataset consists of the following columns:
   - Note: `entity_value` is not present in `test.csv` as it is the target variable.
 
 ## Methodology
+![Screenshot 2025-03-04 at 8 12 31 PM](https://github.com/user-attachments/assets/194fc944-02cc-4b15-a904-56ea0fb5d91c)
+
 Our approach involves:
 1. **Data Preprocessing**:
    - Download and clean images from `image_link`.
